@@ -1,0 +1,43 @@
+<onka-loading *ngIf="status == 'loading'"></onka-loading>
+<div class="upsert-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-card>
+      <div class="onka-actions upsert-header" *ngIf="actionsLeft || actionsRight">
+        <div class="container-left">
+          <ng-content select="onka-actions-left"></ng-content>
+        </div>
+        <div class="container-right">
+          <ng-content select="onka-actions-right"></ng-content>
+          <ng-container *ngIf="!actionsRight"> </ng-container>
+        </div>
+      </div>
+      <mat-card-content>
+        <ng-container *ngFor="let column of inputColumns; index as i">
+          <ng-template [cdkPortalOutlet]="getPortal(column)"></ng-template>
+        </ng-container>
+        <!-- <ng-content select="onka-tab-group"></ng-content> -->
+        <mat-tab-group *ngIf="tabs.length > 0">
+          <ng-container *ngFor="let tab of tabs; index as i">
+            <mat-tab>
+              <ng-template mat-tab-label>
+                {{ onkaService.getRouteLabel(pageConfig, tab.label) }}
+              </ng-template>
+              <div class="onka-tab-content">
+                <ng-container *ngFor="let column of tab.pageFields; index as i">
+                  <ng-template [cdkPortalOutlet]="getPortal(column)"></ng-template>
+                </ng-container>
+              </div>
+            </mat-tab>
+          </ng-container>
+        </mat-tab-group>
+      </mat-card-content>
+
+      <mat-card-actions class="upsert-footer">
+        <div class="container-left"></div>
+        <div class="container-right">
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">{{ isEdit ? 'Update' : 'Create' }}</button>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

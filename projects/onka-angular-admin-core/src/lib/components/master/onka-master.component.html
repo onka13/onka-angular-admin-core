@@ -1,0 +1,91 @@
+<mat-toolbar color="primary" *ngIf="onkaService.isDialog() && onkaService.hasToolbar()">
+  <mat-toolbar-row>
+    <div class="spacer"></div>
+    <div class="toolbar-title">
+      <button mat-button>
+        {{ onkaService.getDialogTitle() }}
+      </button>
+    </div>
+    <div class="spacer"></div>
+    <div fxLayout fxLayoutAlign="flex-end">
+      <ul fxLayout>
+        <li>
+          <button mat-icon-button (click)="onkaService.closeDialog()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>
+<router-outlet *ngIf="onkaService.isDialog()"></router-outlet>
+<mat-drawer-container class="example-container mat-typography" autosize *ngIf="!onkaService.isDialog()">
+  <mat-drawer #drawer mode="side" opened="true">
+    <ng-content select="onka-drawer-top"></ng-content>
+    <ng-container *ngIf="!drawerTop">
+      <div class="m20" fxLayout="row" fxLayoutAlign="center center">
+        <div class="circle wh50 mr10">
+          OK
+        </div>
+        <a [routerLink]="['/profile']">
+          Profile
+        </a>
+      </div>
+      <mat-divider></mat-divider>
+    </ng-container>
+    <ng-content select="onka-menu"></ng-content>
+    <ng-content select="onka-drawer-footer"></ng-content>
+  </mat-drawer>
+  <mat-drawer-content>
+    <div class="container">
+      <mat-toolbar color="primary">
+        <mat-toolbar-row>
+          <button mat-icon-button (click)="drawer.toggle()">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <div class="spacer"></div>
+          <div class="toolbar-title">
+            <button mat-button (click)="title_click()">
+              {{ getTitle() }}
+            </button>
+          </div>
+          <div class="spacer"></div>
+          <div fxLayout fxLayoutAlign="flex-end">
+            <ul fxLayout>
+              <li>
+                <button mat-icon-button (click)="refresh()">
+                  <mat-icon>refresh</mat-icon>
+                </button>
+              </li>
+              <li fxHide.xs>
+                <button mat-icon-button [matMenuTriggerFor]="matMenuLang">
+                  <mat-icon>language</mat-icon>
+                </button>
+                <mat-menu #matMenuLang="matMenu">
+                  <button mat-menu-item (click)="changeLang('en')">
+                    <span>English</span>
+                  </button>
+                  <button mat-menu-item (click)="changeLang('tr')">
+                    <span>Türkçe</span>
+                  </button>
+                </mat-menu>
+              </li>
+              <li>
+                <button mat-icon-button [matMenuTriggerFor]="auth">
+                  <mat-icon>person_outline</mat-icon>
+                </button>
+                <mat-menu #auth="matMenu">
+                  <button mat-menu-item (click)="logout()">
+                    <mat-icon>exit_to_app</mat-icon>
+                    <span>Sign out</span>
+                  </button>
+                </mat-menu>
+              </li>
+            </ul>
+          </div>
+        </mat-toolbar-row>
+      </mat-toolbar>
+      <router-outlet></router-outlet>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

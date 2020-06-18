@@ -1,0 +1,78 @@
+html,
+body {
+  height: 100%;
+  overflow: auto;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;  
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+a {
+  background-color: transparent;
+  text-decoration: none;
+}
+table {
+  width: 100%;
+}
+/* ---- */
+@function pow($number, $exponent) {
+  $value: 1;
+
+  @if $exponent > 0 {
+    @for $i from 1 through $exponent {
+      $value: $value * $number;
+    }
+  }
+
+  @return $value;
+}
+@for $i from 1 through 20 {
+  .w#{$i*10} {
+    width: $i * 10px;
+  }
+  .h#{$i*10} {
+    height: $i * 10px;
+  }
+}
+@for $i from 1 through 10 {
+  .wh#{$i*10} {
+    width: $i * 10px;
+    height: $i * 10px;
+  }
+  .m#{$i*5} {
+    margin: $i * 5px;
+  }
+  .ml#{$i*5} {
+    margin-left: $i * 5px;
+  }
+  .mr#{$i*5} {
+    margin-right: $i * 5px;
+  }
+  .mt#{$i*5} {
+    margin-top: $i * 5px;
+  }
+  .mb#{$i*5} {
+    margin-bottom: $i * 5px;
+  }
+  .p#{$i*5} {
+    padding: $i * 5px;
+  }
+  .pl#{$i*5} {
+    padding-left: $i * 5px;
+  }
+  .pr#{$i*5} {
+    padding-right: $i * 5px;
+  }
+  .pt#{$i*5} {
+    padding-top: $i * 5px;
+  }
+  .pb#{$i*5} {
+    padding-bottom: $i * 5px;
+  }
+}

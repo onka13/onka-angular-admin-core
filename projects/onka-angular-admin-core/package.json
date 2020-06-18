@@ -1,0 +1,27 @@
+{
+  "name": "onka-angular-admin-core",
+  "version": "0.0.1",
+  "description": "Angular admin components",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onka13/onka-angular-libs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/onka13/onka-angular-libs/issues"
+  },
+  "homepage": "https://github.com/onka13/onka-angular-libs",
+  "keywords": [
+    "angular", 
+    "onka",
+    "admin",
+    "nodb",
+    "generator"
+  ],
+  "peerDependencies": {
+    "@angular/common": "^9.1.11",
+    "@angular/core": "^9.1.11"
+  },
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}

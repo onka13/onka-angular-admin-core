@@ -1,0 +1,91 @@
+<onka-loading *ngIf="status == 'loading'"></onka-loading>
+<div class="list-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="list-search">
+      <div class="container-left">
+        <ng-content select="onka-search-left"></ng-content>
+        <ng-container *ngIf="!searchFieldsLeft"> </ng-container>
+      </div>
+      <div class="list-search-fields">
+        <ng-container *ngIf="!onkaService.isHideFilters()">
+          <ng-container *ngFor="let column of filterColumns; index as i">
+            <ng-template [cdkPortalOutlet]="getFilterPortal(column)"></ng-template>
+          </ng-container>
+        </ng-container>
+      </div>
+      <div class="container-right">
+        <ng-container *ngIf="!onkaService.isHideActions()">
+          <ng-content select="onka-search-right"></ng-content>
+          <ng-container *ngIf="!searchFieldsRight">
+            <a mat-raised-button [routerLink]="[pageConfig.route + '/create']" preserveQueryParams
+              ><mat-icon>add</mat-icon>
+              {{ 'onka.action.create' | onkaTranslate }}
+            </a>
+          </ng-container></ng-container
+        >
+      </div>
+    </div>
+  </form>
+  <div class="list-table-container mat-elevation-z8">
+    <mat-table [dataSource]="dataSource" matSort matSortStart="desc" (matSortChange)="customSort($event)">
+      <ng-container matColumnDef="checkbox">
+        <mat-header-cell *matHeaderCellDef class="header-checkbox">
+          <mat-checkbox
+            (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+            [aria-label]="checkboxLabel()"
+          >
+          </mat-checkbox>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="row-checkbox">
+          <mat-checkbox
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)"
+            [aria-label]="checkboxLabel(row)"
+          >
+          </mat-checkbox>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="select">
+        <mat-header-cell *matHeaderCellDef class="header-select"> </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="row-select">
+          <a mat-button (click)="select_clicked(row)"><mat-icon>check_circle_outline</mat-icon> Select</a>
+        </mat-cell>
+      </ng-container>
+      <ng-container *ngFor="let column of displayedColumns; index as i" [matColumnDef]="column.name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="!column.isSortable">{{ getColumnLabel(column) }}</mat-header-cell>
+        <mat-cell *matCellDef="let row"><ng-template [cdkPortalOutlet]="getGridPortal(column, row)"></ng-template></mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="header-actions"></mat-header-cell>
+        <mat-cell *matCellDef="let row" class="row-actions">
+          <ng-container *ngIf="!onkaService.isHideActions()">
+            <a mat-icon-button [routerLink]="[pageConfig.route + '/detail', row.id]" preserveQueryParams><mat-icon>remove_red_eye</mat-icon></a>
+            <a mat-icon-button [routerLink]="[pageConfig.route + '/edit', row.id]" preserveQueryParams><mat-icon>edit</mat-icon></a>
+            <button mat-icon-button color="warn" (click)="delete(row.id)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="loading">
+        <mat-footer-cell *matFooterCellDef>
+          {{ 'onka.loading' | onkaTranslate }}
+        </mat-footer-cell>
+      </ng-container>
+      <ng-container matColumnDef="noData">
+        <mat-footer-cell *matFooterCellDef>
+          {{ 'onka.page.no_data' | onkaTranslate }}
+        </mat-footer-cell>
+      </ng-container>
+      <!-- sticky: true -->
+      <mat-header-row *matHeaderRowDef="getGridColumns()"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: getGridColumns()"></mat-row>
+      <mat-footer-row *matFooterRowDef="['loading']" [ngClass]="{ hide: status != 'loading' }"></mat-footer-row>
+      <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{ hide: status != 'no-data' }"></mat-footer-row>
+    </mat-table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="5" showFirstLastButtons class="mat-paginator-sticky"></mat-paginator>
+  </div>
+</div>

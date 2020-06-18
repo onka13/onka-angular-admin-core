@@ -1,0 +1,38 @@
+<onka-loading *ngIf="status == 'loading'"></onka-loading>
+<div class="detail-container" *ngIf="data">
+  <mat-card>
+    <div class="onka-actions detail-header" *ngIf="!onkaService.isHideActions()">
+      <div class="container-left">
+        <ng-content select="onka-actions-left"></ng-content>
+      </div>
+      <div class="spacer"></div>
+      <div class="container-right">
+        <ng-content select="onka-actions-right"></ng-content>
+        <ng-container *ngIf="!actionsRight">
+          <a mat-button [routerLink]="[pageConfig.route + '/edit/', id]" preserveQueryParams><mat-icon>edit</mat-icon> Edit</a>
+        </ng-container>
+      </div>
+    </div>
+    <mat-card-content>
+      <div class="detail-rows">
+        <ng-container *ngFor="let column of displayColumns; index as i">
+          <ng-template [cdkPortalOutlet]="getPortal(column)"></ng-template>
+        </ng-container>
+        <mat-tab-group *ngIf="tabs.length > 0">
+          <ng-container *ngFor="let tab of tabs; index as i">
+            <mat-tab>
+              <ng-template mat-tab-label>
+                {{ tab.label }}
+              </ng-template>
+              <div class="onka-tab-content">
+                <ng-container *ngFor="let column of tab.pageFields; index as i">
+                  <ng-template [cdkPortalOutlet]="getPortal(column)"></ng-template>
+                </ng-container>
+              </div>
+            </mat-tab>
+          </ng-container>
+        </mat-tab-group>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
