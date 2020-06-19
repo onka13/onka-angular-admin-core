@@ -1,3 +1,6 @@
+/**
+ * Base enum list
+ */
 export const onkaEnums = {
   YesNo: {
     none: null,

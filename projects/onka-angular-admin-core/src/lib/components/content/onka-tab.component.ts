@@ -1,6 +1,9 @@
 import { Component, OnInit, AfterViewInit, Input, Directive, TemplateRef } from '@angular/core';
 import { OnkaPageField } from '../../domain/onka/onka-page-field';
 
+/**
+ * Onka tab
+ */
 @Component({
   selector: 'onka-tab',
   template: `<ng-content></ng-content>`

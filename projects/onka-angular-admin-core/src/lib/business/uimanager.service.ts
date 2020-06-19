@@ -10,6 +10,9 @@ import { LocaleService } from './services/locale-service';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { OnkaDialogComponent, DialogData } from '../components/onka-dialog.component';
 
+/**
+ * Contains ui related helpers
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -25,6 +28,10 @@ export class UIManagerService {
   ) {
     this.init();
   }
+
+  /**
+   * initialize
+   */
   init() {
     console.log('UIManagerService init', this.snackBar);
     // mat-icon default font
@@ -33,6 +40,11 @@ export class UIManagerService {
     // catch all api responses
     this.businessBase.apiResponse.subscribe((data) => this.onApiResponse(data));
   }
+
+  /**
+   * Process api response
+   * @param response http response
+   */
   private onApiResponse(response: ServiceHttpStatusResult<any>) {
     if (!response) return;
     console.log('api response', response);
@@ -53,6 +65,12 @@ export class UIManagerService {
       this.displayMessage(this.config.isProd() ? this.localeService.translate('onka.error') : response.statusText, 'error');
     }
   }
+
+  /**
+   * Display message
+   * @param msg message
+   * @param type type
+   */
   displayMessage(msg: string, type: MessageType) {
     if (!msg) return;
     const snack = this.snackBar.open(msg, type == 'error' ? 'X' : null, {
@@ -65,6 +83,10 @@ export class UIManagerService {
       snack.dismiss();
     });
   }
+
+  /**
+   * Opne dialog
+   */
   openDialog(
     config: MatDialogConfig<DialogData>,
     afterClosed?: (result: any) => void,
@@ -99,6 +121,9 @@ export class UIManagerService {
     });
   }
 
+  /**
+   * Open confirm dialog
+   */
   confirm(data: DialogData, callback: (res: any) => void) {
     this.openDialog(
       {

@@ -1,13 +1,26 @@
 import { Injectable } from '@angular/core';
 import { LanguagelistType } from './locale-service';
 
+/**
+ * Configuration service
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class ConfigService {
+  /**
+   * Api Url
+   */
   _apiUrl: string;
+
+  /**
+   * True if prod env
+   */
   _isProd: boolean;
 
+  /**
+   * Language list
+   */
   _langList: LanguagelistType = {};
 
   getApiUrl() {

@@ -5,6 +5,9 @@ import { AccountBusinessLogic } from '../../business/services/account-business-l
 import { ApiBusinessLogic } from '../../business/services/api-business-logic';
 import { HttpClient } from '@angular/common/http';
 
+/**
+ * Onka login component
+ */
 @Component({
   selector: 'onka-login',
   templateUrl: './onka-login.component.html',
@@ -22,20 +25,22 @@ import { HttpClient } from '@angular/common/http';
   ],
 })
 export class OnkaLoginComponent {
-  message: string;
-  username: string;
-  password: string;
-
+  /**
+   * login form
+   */
   form: FormGroup;
 
-  public loginInvalid: boolean;
-
+  /**
+   * Return url
+   */
   private returnUrl: string;
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private accountBusiness: AccountBusinessLogic,
-    private apiBusinessLogic: ApiBusinessLogic,
-    private http: HttpClient
-    ) {}
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private accountBusiness: AccountBusinessLogic
+  ) {}
 
   async ngOnInit() {
     this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/panel';
@@ -46,8 +51,10 @@ export class OnkaLoginComponent {
     });
   }
 
+  /**
+   * On form submit
+   */
   onSubmit() {
-    this.loginInvalid = false;
     if (!this.form.valid) {
       return;
     }
@@ -61,9 +68,5 @@ export class OnkaLoginComponent {
       };
       this.router.navigate(['/panel'], navigationExtras);
     });
-  }
-
-  logout() {
-    this.accountBusiness.logout();
   }
 }

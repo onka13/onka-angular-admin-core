@@ -1,7 +1,11 @@
+/**
+ * Generate public-api.ts
+ */
 const fs = require('fs');
 const path = require('path');
 var folder = './projects/onka-angular-admin-core/src';
-var exports = '';
+var exports = '// Auto generated file\n';
+exports += '// Run command `node .\\generatePublicApi.js`\n\n';
 
 function prepareFiles(dir) {
   console.log('prepareFiles', dir);

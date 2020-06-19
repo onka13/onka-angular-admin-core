@@ -27,23 +27,70 @@ import { OnkaPageStatus } from '../../domain/onka/onka-types';
 import { delay, finalize } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+/**
+ * Onka detil component
+ * 
+ * 
+ */
 @Component({
   selector: 'onka-detail',
   templateUrl: './onka-detail.component.html',
 })
 export class OnkaDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+  /**
+   * Configuration Data
+   */
   @Input() pageConfig: OnkaPageConfig;
+
+  /**
+   * Column list
+   */
   @Input() displayColumns: OnkaPageField[];
 
+  /**
+   * Tab content
+   */
   @ContentChildren(OnkaTabComponent, { descendants: true }) tabs!: QueryList<OnkaTabComponent>;
+
+  /**
+   * Actions side left content
+   */
   @ContentChild(OnkaActionsLeftComponent) actionsLeft: ElementRef;
+
+  /**
+   * Actions side right content
+   */
   @ContentChild(OnkaActionsRightComponent) actionsRight: ElementRef;
 
+  /**
+   * Id value
+   */
   id: any;
+  
+  /**
+   * edit or new 
+   */
   isEdit = false;
+
+  /**
+   * data of entity
+   */
   data;
+
+  /**
+   * page status
+   */
   status: OnkaPageStatus;
+
+  /**
+   * Refresh data subscription
+   */
   refreshSubscription: Subscription;
+
+  /**
+   * Portal list
+   */
+  _portals = {};
 
   constructor(
     public onkaService: OnkaService,
@@ -70,6 +117,9 @@ export class OnkaDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.refreshSubscription.unsubscribe();
   }
 
+  /**
+   * Load data if id exists
+   */
   loadData() {
     if (!this.id) return;
     this.status = 'loading';
@@ -87,7 +137,10 @@ export class OnkaDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  _portals = {};
+  /**
+   * Get component
+   * @param item fields
+   */
   getPortal(item: OnkaPageField) {
     if (this._portals[item.name]) return this._portals[item.name];
     var injector2 = Injector.create({

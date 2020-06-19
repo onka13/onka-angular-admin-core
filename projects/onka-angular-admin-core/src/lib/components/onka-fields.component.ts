@@ -3,6 +3,9 @@ import { OnkaGridPass } from '../domain/onka/onka-grid-pass';
 import { OnkaDetailPass } from '../domain/onka/onka-detail-pass';
 import { OnkaService } from '../business/services/onka-service';
 
+/**
+ * Onka grid field component
+ */
 @Component({
   selector: 'onka-grid-field',
   template: '<span>{{ data.data[data.column.name] }}</span>',
@@ -16,6 +19,9 @@ export class OnkaGridFieldComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {}
 }
 
+/**
+ * Onka detail field component
+ */
 @Component({
   selector: 'onka-detail-field',
   template: `<div class="detail-row">
@@ -24,7 +30,11 @@ export class OnkaGridFieldComponent implements OnInit, AfterViewInit {
   </div>`,
 })
 export class OnkaDetailFieldComponent implements OnInit, AfterViewInit {
+  /**
+   * Displayed value
+   */
   val;
+
   constructor(public pass: OnkaDetailPass, public onkaService: OnkaService) {
     //console.log('OnkaDetailFieldComponent', pass.column.name, pass.data);
     this.val = pass.data[pass.column.name];
@@ -37,6 +47,9 @@ export class OnkaDetailFieldComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {}
 
+  /**
+   * Get translated label
+   */
   getLabel() {
     return this.onkaService.getColumnLabel(this.pass.pageConfig, this.pass.column);
   }

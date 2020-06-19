@@ -5,12 +5,14 @@ import {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   CanActivateChild,
-  NavigationExtras,
   CanLoad,
   Route,
 } from '@angular/router';
 import { AccountBusinessLogic } from '../services/account-business-logic';
 
+/**
+ * Check the user is logged in. 
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -33,29 +35,27 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
     return this.canActivate(route, state);
   }
 
+  /**
+   * load the route if user is logged in
+   * @param route 
+   */
   canLoad(route: Route): boolean {
     let url = `/${route.path}`;
 
     return this.checkLogin(url);
   }
 
+  /**
+   * check the user is logged in
+   * @param url 
+   */
   checkLogin(url: string): boolean {
     if (this.accountBusiness.isLoggedIn()) {
       return true;
     }
 
-    // Store the attempted URL for redirecting
-    //this.accountBusiness.redirectUrl = url;
-
-    // Set our navigation extras object
-    // that contains our global query params and fragment
-    let navigationExtras: NavigationExtras = {
-      //queryParams: { session_id: sessionId },
-      //fragment: 'anchor',
-    };
-
     // Navigate to the login page with extras
-    this.router.navigate(['/login'], navigationExtras);
+    this.router.navigate(['/login']);
     return false;
   }
 }

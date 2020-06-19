@@ -1,7 +1,9 @@
+// Auto generated file
+// Run command `node .\generatePublicApi.js`
+
 export * from './lib/business/guards/auth.guard';
 export * from './lib/business/helpers/request-helper';
 export * from './lib/business/pipes/onka-translate.pipe';
-export * from './lib/business/pipes/safe-pipe';
 export * from './lib/business/services/account-business-logic';
 export * from './lib/business/services/api-business-logic';
 export * from './lib/business/services/base-business-logic.service';
@@ -33,8 +35,6 @@ export * from './lib/components/upsert/onka-upsert.component';
 export * from './lib/domain/api/api-request';
 export * from './lib/domain/api/service-result';
 export * from './lib/domain/models/dummy-error';
-export * from './lib/domain/models/error-model';
-export * from './lib/domain/models/message-model';
 export * from './lib/domain/onka/onka-detail-pass';
 export * from './lib/domain/onka/onka-enums';
 export * from './lib/domain/onka/onka-filter-pass';

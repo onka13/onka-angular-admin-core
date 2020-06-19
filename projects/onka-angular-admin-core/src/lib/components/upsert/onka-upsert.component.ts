@@ -13,7 +13,6 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { ApiBusinessLogic } from '../../business/services/api-business-logic';
 import { OnkaInputPass } from '../../domain/onka/onka-input-pass';
@@ -25,29 +24,88 @@ import { OnkaActionsRightComponent } from '../content/onka-actions-right.compone
 import { OnkaTabComponent } from '../content/onka-tab.component';
 import { OnkaService } from '../../business/services/onka-service';
 import { OnkaPageStatus } from '../../domain/onka/onka-types';
-import { catchError, finalize } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+/**
+ * Onka Upsert component
+ */
 @Component({
   selector: 'onka-upsert',
   templateUrl: './onka-upsert.component.html',
 })
 export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
+  /**
+   * Configuration data
+   */
   @Input() pageConfig: OnkaPageConfig;
+
+  /**
+   * Input column list
+   */
   @Input() inputColumns: OnkaPageField[] = [];
+
+  /**
+   * Initial values
+   */
   @Input() initialValues: any = {};
 
-  @ContentChildren(OnkaTabComponent, { descendants: true }) tabs!: QueryList<OnkaTabComponent>;
+  /**
+   * Tab components
+   */
+  @ContentChildren(OnkaTabComponent, { descendants: true }) tabs!: QueryList<
+    OnkaTabComponent
+  >;
+
+  /**
+   * Actions left content
+   */
   @ContentChild(OnkaActionsLeftComponent) actionsLeft: ElementRef;
+
+  /**
+   * Actions right content
+   */
   @ContentChild(OnkaActionsRightComponent) actionsRight: ElementRef;
 
+  /**
+   * Form
+   */
   form: FormGroup;
+
+  /**
+   * Entity id
+   */
   id: any;
+
+  /**
+   * Is update or create
+   */
   isEdit = false;
+
+  /**
+   * Entity data
+   */
   data = {};
+
+  /**
+   * Page status
+   */
   status: OnkaPageStatus;
+
+  /**
+   * Refresh subscription
+   */
   refreshSubscription: Subscription;
+
+  /**
+   * Default values
+   */
   defaultValues: any;
+
+  /**
+   * Components
+   */
+  _portals = {};
 
   constructor(
     private fb: FormBuilder,
@@ -55,7 +113,7 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
     private business: ApiBusinessLogic,
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -81,6 +139,9 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
     this.refreshSubscription.unsubscribe();
   }
 
+  /**
+   * Make an api request
+   */
   loadData() {
     if (!this.isEdit) {
       //this.bindDefaultValues();
@@ -92,7 +153,7 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.status = 'done';
-        }),
+        })
       )
       .subscribe((data) => {
         this.data = data.value;
@@ -104,24 +165,20 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  /*bindDefaultValues() {
-    if (this.isEdit) return;
-    var entity = {};
-    for (const key in this.defaultValues) {
-      if (this.pageConfig.fields.filter((x) => x.name == key).length == 0) continue;
-      entity[key] = this.defaultValues[key];
-    }
-    if (Object.keys(entity).length > 0) this.form.patchValue(entity);
-  }*/
-
-  _portals = {};
+  /**
+   * Get component
+   */
   getPortal(item: OnkaPageField) {
     if (this.onkaService.isHideDefaultFilters()) {
       // hide filters active
       if (Object.keys(this.defaultValues).indexOf(item.name) != -1) return null;
     }
     if (this._portals[item.name]) return this._portals[item.name];
-    if (!this.form.controls[item.name]) this.form.addControl(item.name, new FormControl(this.data[item.name], { validators: item.validators }));
+    if (!this.form.controls[item.name])
+      this.form.addControl(
+        item.name,
+        new FormControl(this.data[item.name], { validators: item.validators })
+      );
     var injector2 = Injector.create({
       providers: [
         {
@@ -141,14 +198,18 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
       parent: this.injector,
     });
     this._portals[item.name] = new ComponentPortal(
-      (this.isEdit ? item.editComponent : item.createComponent) || OnkaInputComponent,
+      (this.isEdit ? item.editComponent : item.createComponent) ||
+        OnkaInputComponent,
       null,
       injector2,
-      this.componentFactoryResolver,
+      this.componentFactoryResolver
     );
     return this._portals[item.name];
   }
 
+  /**
+   * On form submit
+   */
   onSubmit() {
     if (!this.form.valid || this.status == 'loading') {
       return;
@@ -160,11 +221,14 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.status = 'done';
-        }),
+        })
       )
       .subscribe((record) => {
         var redirect = this.onkaService.getRedirect() || 'list';
-        this.onkaService.gotoPage(redirect, this.pageConfig, { id: record.value.id, preserveQueryParams: true });
+        this.onkaService.gotoPage(redirect, this.pageConfig, {
+          id: record.value.id,
+          preserveQueryParams: true,
+        });
       });
   }
 }

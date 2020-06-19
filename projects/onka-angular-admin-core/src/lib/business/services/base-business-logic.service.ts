@@ -8,18 +8,34 @@ import { DummyError } from '../../domain/models/dummy-error';
 import { ConfigService } from './config-service';
 import { StaticService } from './static-service';
 
+/**
+ * Bridge for request and response
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class BaseBusinessLogicService {
+  /**
+   * Emit for all api response
+   */
   public apiResponse = new Subject<ServiceHttpStatusResult<any>>();
 
   private requestHelper: RequestHelper;
+
   constructor(http: HttpClient, config: ConfigService,private staticService: StaticService) {
     console.log('BaseBusinessLogicService cons');
     this.requestHelper = RequestHelper.instance(http, config.getApiUrl());
     this.processResponse = this.processResponse.bind(this);
   }
+
+  /**
+   * Prepare data and parameters then make a request and validate the response
+   * @param method method
+   * @param endpoint endpoint
+   * @param body body
+   * @param parameters extra parameters 
+   * @param headers extra header
+   */
   request<T>(method: Method, endpoint: string, body?: any, parameters?: Parameters, headers?: Parameters): Observable<T> {
     console.log('REQUEST', method, endpoint);
     if (!headers) headers = {};
@@ -43,6 +59,10 @@ export class BaseBusinessLogicService {
       );
   }
 
+  /**
+   * Check response of the api
+   * @param response http response object
+   */
   processResponse<T>(response: HttpResponse<ServiceResult<T>> | HttpErrorResponse | any): Observable<HttpResponse<ServiceResult<T>>> {
     var body = response instanceof HttpErrorResponse ? (response as HttpErrorResponse).error : (response as HttpResponse<ServiceResult<T>>).body;
 

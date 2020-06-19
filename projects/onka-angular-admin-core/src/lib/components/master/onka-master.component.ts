@@ -8,14 +8,27 @@ import { UIManagerService } from '../../business/uimanager.service';
 import { OnkaDrawerTopComponent } from '../content/onka-drawer-top.component';
 import { OnkaDrawerFooterComponent } from '../content/onka-drawer-footer.component';
 
+/**
+ * Onka master page if access granted
+ */
 @Component({
   selector: 'onka-master',
   templateUrl: './onka-master.component.html',
 })
 export class OnkaMasterComponent implements OnInit {
+  /**
+   * Last selected page
+   */
   pageConfig: OnkaPageConfig;
 
+  /**
+   * Drawer top content
+   */
   @ContentChild(OnkaDrawerTopComponent) drawerTop: ElementRef;
+
+  /**
+   * Drawer bottom content
+   */
   @ContentChild(OnkaDrawerFooterComponent) drawerFooter: ElementRef;
 
   constructor(
@@ -31,72 +44,43 @@ export class OnkaMasterComponent implements OnInit {
       });
     });
   }
+  
   ngOnInit(): void {}
+
+  /**
+   * Get toolbar title
+   */
   getTitle() {
     return this.onkaService.getRouteLabel(this.pageConfig);
   }
+
+  /**
+   * Toolbar title click
+   */
   title_click() {
     this.onkaService.gotoPage('list', this.pageConfig);
   }
+
+  /**
+   * Logout user
+   */
   logout() {
     this.accountBusiness.logout();
     this.router.navigate(['/login']);
   }
+
+  /**
+   * Change language
+   */
   changeLang(lang) {
     this.localeService.changeLang(lang);
     window.location.reload();
   }
 
+  /**
+   * Refresh displayed data 
+   */
   refresh() {
     this.onkaService.refreshPage.next();
   }
-
-  /*test() {
-    this.uiManager.openDialog(
-      {
-        data: {
-          title: 'Warning!',
-          content: 'Are you sure?',
-          actions: [
-            { label: 'No', value: 0 },
-            { label: 'Yes', value: 1, color: 'primary' },
-          ],
-        },
-      },
-      (result) => {},
-      {
-        small: true,
-      },
-    );
-    return;
-    this.uiManager.openDialog(
-      {
-        //disableClose: true,
-        //position: {
-        //  right: '0',
-        //},
-        data: {
-          url: 'AdminApi/AdminUserSearch',
-          //hideFilters: true,
-          addSelectField: true,
-          defaultValues: { name: 'asd' },
-          hideActions: true,
-          hideDefaultFilters: true,
-          title: 'Admin Users',
-          toolbar: true,
-          //redirect: 'edit'
-        },
-      },
-      (record) => {
-        console.log('selected record', record);
-      },
-      {
-        //width: '400px',
-        //height: '100vh',
-        //width: '50vw',
-        //height: '70vh',
-        //fullScreen: true,
-      },
-    );
-  }*/
 }

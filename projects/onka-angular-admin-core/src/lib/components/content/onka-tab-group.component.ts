@@ -2,6 +2,9 @@ import { Component, OnInit, AfterViewInit, ContentChild, TemplateRef, ViewChildr
 import { OnkaTabComponent } from './onka-tab.component';
 import { MatTabGroup } from '@angular/material/tabs';
 
+/**
+ * Tab group
+ */
 @Component({
   selector: 'onka-tab-group',
   template: `<mat-tab-group>

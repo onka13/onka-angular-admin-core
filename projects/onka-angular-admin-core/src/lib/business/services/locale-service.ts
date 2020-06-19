@@ -8,11 +8,21 @@ import { StaticService } from './static-service';
 
 export type LanguagelistType = { [x: string]: () => Promise<any> };
 
+/**
+ * Localization service
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class LocaleService {
+  /**
+   * Json content of l10n
+   */
   jsonContent = {};
+
+  /**
+   * Language list
+   */
   langList: LanguagelistType = {
     en: () => Promise.resolve(en),
     tr: () => Promise.resolve(tr),
@@ -27,11 +37,18 @@ export class LocaleService {
     console.log('LocaleService cons');
   }
 
+  /**
+   * Load default language
+   */
   loadDefaultLang(): Promise<any> {
     var lang = this.staticService.getCurrentLang();
     return this.changeLang(lang);
   }
 
+  /**
+   * Change selected language
+   * @param lang language
+   */
   changeLang(lang: string): Promise<any> {
     if (!lang) lang = 'en';
     console.log('LocaleService changeLang', lang);
@@ -57,10 +74,21 @@ export class LocaleService {
       });
   }
 
+  /**
+   * get content by key
+   * @param key key
+   * @param defaultValue default value
+   */
   get(key: string, defaultValue?: string): any {
     return lodash.get(this.jsonContent, key, defaultValue);
   }
 
+  /**
+   * Get translation by key
+   * @param key key
+   * @param defaultValue default value
+   * @param formatParams parameters to replace, like; { title: 'Hello' }
+   */
   translate(key: string, defaultValue?: string, formatParams?: object): string {
     return lodash.template(this.get(key, defaultValue))(formatParams);
   }

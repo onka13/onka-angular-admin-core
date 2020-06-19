@@ -1,15 +1,12 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  InjectionToken,
-  Input,
-} from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { OnkaFilterPass } from '../domain/onka/onka-filter-pass';
 import { OnkaInputPass } from '../domain/onka/onka-input-pass';
 import { OnkaService } from '../business/services/onka-service';
 
+/**
+ * Onka filter component
+ */
 @Component({
   selector: 'onka-filter',
   template: `
@@ -46,6 +43,9 @@ export class OnkaFilterComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {}
 
+  /**
+   * Get translated label
+   */
   getLabel() {
     return this.onkaService.getColumnLabel(
       this.pass.pageConfig,
@@ -53,12 +53,18 @@ export class OnkaFilterComponent implements OnInit, AfterViewInit {
     );
   }
 
+  /**
+   * Clear the input value
+   */
   onSearchClear() {
     this.formControl.setValue('');
     this.pass.loadData();
   }
 }
 
+/**
+ * Onka input component
+ */
 @Component({
   selector: 'onka-input',
   template: `
@@ -79,6 +85,9 @@ export class OnkaInputComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {}
 
+  /**
+   * Get translated label
+   */
   getLabel() {
     return this.onkaService.getColumnLabel(
       this.pass.pageConfig,
@@ -86,6 +95,9 @@ export class OnkaInputComponent implements OnInit, AfterViewInit {
     );
   }
 
+  /**
+   * Get error message
+   */
   getErrorMessage() {
     for (const key in this.formControl.errors) {
       //console.log('validation', key, this.formControl.errors[key]);
@@ -101,22 +113,14 @@ export class OnkaInputComponent implements OnInit, AfterViewInit {
   }
 }
 
+/**
+ * Onka checkbox
+ */
 @Component({
   selector: 'onka-checkbox',
   template: `
     <div class="mat-form-field onka-input input-{{ pass.column.name }}">
-      <div class="mat-form-field-flex">
-        <div class="mat-form-field-infix">
-          <mat-checkbox [formControl]="formControl">{{
-            getLabel()
-          }}</mat-checkbox>
-        </div>
-      </div>
-      <div class="mat-form-field-subscript-wrapper">
-        <mat-error *ngIf="formControl.invalid">{{
-          getErrorMessage()
-        }}</mat-error>
-      </div>
+      <mat-checkbox [formControl]="formControl">{{ getLabel() }}</mat-checkbox>
     </div>
   `,
 })
@@ -128,14 +132,11 @@ export class OnkaCheckboxComponent extends OnkaInputComponent {
   ) {
     super(formControl, pass, onkaService);
   }
-  getCheckBoxError() {
-    if (this.formControl.touched) {
-      return this.formControl.invalid;
-    }
-    return false;
-  }
 }
 
+/**
+ * Onka date
+ */
 @Component({
   selector: 'onka-date',
   template: `
@@ -158,6 +159,9 @@ export class OnkaDateComponent extends OnkaInputComponent {
   }
 }
 
+/**
+ * Onka textarea
+ */
 @Component({
   selector: 'onka-textarea',
   template: `
@@ -181,6 +185,9 @@ export class OnkaTextareaComponent extends OnkaInputComponent {
   }
 }
 
+/**
+ * Onka dropdown component
+ */
 @Component({
   selector: 'onka-select',
   template: `
@@ -196,7 +203,11 @@ export class OnkaTextareaComponent extends OnkaInputComponent {
   `,
 })
 export class OnkaSelectComponent extends OnkaInputComponent {
+  /**
+   * Items to display
+   */
   @Input() items: { key: string; label: any }[];
+
   constructor(
     public formControl: FormControl,
     public pass: OnkaInputPass,
@@ -212,6 +223,9 @@ export class OnkaSelectComponent extends OnkaInputComponent {
   }
 }
 
+/**
+ * Onka slide toggle
+ */
 @Component({
   selector: 'onka-slide-toggle',
   template: `
@@ -232,6 +246,9 @@ export class OnkaSlideToggleComponent extends OnkaInputComponent {
   }
 }
 
+/**
+ * Onka number input component
+ */
 @Component({
   selector: 'onka-number',
   template: `

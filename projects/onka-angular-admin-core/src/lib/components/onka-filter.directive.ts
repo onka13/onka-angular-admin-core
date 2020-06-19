@@ -2,10 +2,16 @@ import { ElementRef, OnInit, Directive, Output, EventEmitter } from '@angular/co
 import { fromEvent } from 'rxjs';
 import { distinctUntilChanged, tap, debounceTime } from 'rxjs/operators';
 
+/**
+ * Onka filter directive
+ */
 @Directive({
   selector: '[onkaFilter]',
 })
 export class OnkaFilterDirective implements OnInit {
+  /**
+   * Emit on keyup
+   */
   @Output('onkaFilter') emitter = new EventEmitter();
 
   constructor(private el: ElementRef) {}

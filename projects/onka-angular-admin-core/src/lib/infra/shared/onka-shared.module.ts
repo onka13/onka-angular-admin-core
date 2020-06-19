@@ -21,14 +21,29 @@ import { OnkaMenuComponent } from '../../components/onka-menu.component';
 import { OnkaTabGroupComponent } from '../../components/content/onka-tab-group.component';
 import { OnkaTabComponent } from '../../components/content/onka-tab.component';
 import { OnkaLoadingComponent } from '../../components/content/onka-loading.component';
-import { SafePipe } from '../../business/pipes/safe-pipe';
 import { OnkaDialogComponent } from '../../components/onka-dialog.component';
 import { OnkaMasterComponent } from '../../components/master/onka-master.component';
 import { OnkaDrawerTopComponent } from '../../components/content/onka-drawer-top.component';
 import { OnkaDrawerFooterComponent } from '../../components/content/onka-drawer-footer.component';
 import { OnkaLoginComponent } from '../../components/login/onka-login.component';
 
-const sharedModules: any[] = [CommonModule, ReactiveFormsModule, FormsModule, HttpClientModule, FlexLayoutModule, MaterialModule, RouterModule, PortalModule];
+/**
+ * module list
+ */
+const sharedModules: any[] = [
+  CommonModule,
+  ReactiveFormsModule,
+  FormsModule,
+  HttpClientModule,
+  FlexLayoutModule,
+  MaterialModule,
+  RouterModule,
+  PortalModule,
+];
+
+/**
+ * Component list
+ */
 var sharedComponents: any[] = [
   OnkaFilterDirective,
   OnkaListComponent,
@@ -38,9 +53,8 @@ var sharedComponents: any[] = [
   OnkaSearchRightComponent,
   OnkaActionsLeftComponent,
   OnkaActionsRightComponent,
-  OnkaTranslatePipe,  
-  SafePipe,
-  OnkaDialogComponent,  
+  OnkaTranslatePipe,
+  OnkaDialogComponent,
   OnkaMenuComponent,
   OnkaTabGroupComponent,
   OnkaTabComponent,
@@ -58,11 +72,14 @@ var sharedComponents: any[] = [
   allInputs.OnkaSlideToggleComponent,
   allInputs.OnkaTextareaComponent,
   allFields.OnkaDetailFieldComponent,
-  allFields.OnkaGridFieldComponent
+  allFields.OnkaGridFieldComponent,
   //...[Object.values(allInputs)],
   //...[Object.values(allFields)],
 ];
 
+/**
+ * Onka shared module
+ */
 @NgModule({
   imports: sharedModules,
   declarations: sharedComponents,

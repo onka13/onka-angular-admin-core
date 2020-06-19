@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { StaticService } from '../../business/services/static-service';
 
 import { MatNativeDateModule,				  } from '@angular/material/core'; // Core
 import { MatFormFieldModule,			    } from '@angular/material/form-field'; // Form
@@ -35,7 +36,7 @@ import { MatSnackBarModule            } from '@angular/material/snack-bar';
 import { MatPaginatorModule,			    } from '@angular/material/paginator'; // Data Table
 import { MatSortModule,				        } from '@angular/material/sort';
 import { MatTableModule,			        } from '@angular/material/table';
-import { StaticService } from '../../business/services/static-service';
+
 
 const modules = [
     MatNativeDateModule,				
@@ -74,6 +75,9 @@ const modules = [
     MatSnackBarModule     		        
 ];
 
+/**
+ * Material module 
+ */
 @NgModule({
   declarations: [],
   imports: [...modules],
