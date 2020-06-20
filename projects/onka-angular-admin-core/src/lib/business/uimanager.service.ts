@@ -2,13 +2,13 @@ import { Injectable, NgZone } from '@angular/core';
 import { BaseBusinessLogicService } from './services/base-business-logic.service';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MessageType } from '../domain/models/message-model';
 import { ServiceHttpStatusResult } from '../domain/api/service-result';
 import { Router } from '@angular/router';
 import { ConfigService } from './services/config-service';
 import { LocaleService } from './services/locale-service';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { OnkaDialogComponent, DialogData } from '../components/onka-dialog.component';
+import { MessageType } from '../domain/onka/onka-types';
 
 /**
  * Contains ui related helpers

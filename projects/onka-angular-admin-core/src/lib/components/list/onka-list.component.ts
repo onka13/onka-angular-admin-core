@@ -195,6 +195,11 @@ export class OnkaListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.refreshSubscription.unsubscribe();
   }
 
+  customSort(event) {
+    console.log('e', event);
+    return false;
+  }
+
   /**
    * Get filter components
    * @param item field
@@ -340,7 +345,9 @@ export class OnkaListComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param id id
    */
   delete(id) {
-    this.uiManager.confirm({}, (res) => {
+    this.uiManager.confirm({
+
+    }, (res) => {
       if (!res) return;
       this.business.delete(this.pageConfig.route, id).subscribe(() => {
         this.loadData();
