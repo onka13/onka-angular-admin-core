@@ -114,7 +114,7 @@ export class OnkaDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.refreshSubscription.unsubscribe();
+    this.refreshSubscription?.unsubscribe();
   }
 
   /**

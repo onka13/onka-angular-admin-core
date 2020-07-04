@@ -1,8 +1,32 @@
-import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  Input,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { OnkaFilterPass } from '../domain/onka/onka-filter-pass';
 import { OnkaInputPass } from '../domain/onka/onka-input-pass';
 import { OnkaService } from '../business/services/onka-service';
+import { ApiBusinessLogic } from '../business/services/api-business-logic';
+import { Observable, fromEvent } from 'rxjs';
+import {
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { OnkaOption } from '../domain/onka/onka-types';
+import { ApiSearchRequest } from '../domain/api/api-request';
+import { OnkaReference } from '../domain/onka/onka-reference';
+import {
+  startWith,
+  debounceTime,
+  distinctUntilChanged,
+  tap,
+} from 'rxjs/operators';
 
 /**
  * Onka filter component
@@ -206,7 +230,7 @@ export class OnkaSelectComponent extends OnkaInputComponent {
   /**
    * Items to display
    */
-  @Input() items: { key: string; label: any }[];
+  @Input() items: OnkaOption[];
 
   constructor(
     public formControl: FormControl,
@@ -269,6 +293,132 @@ export class OnkaNumberComponent extends OnkaInputComponent {
   }
 }
 
+/**
+ * Onka ref component
+ */
+@Component({
+  selector: 'onka-reference',
+  template: `
+    <mat-form-field class="onka-input input-{{ pass.column.name }}">
+      <mat-label>{{ getLabel() }}</mat-label>
+      <mat-chip-list #chipList aria-label="selection">
+        <mat-chip
+          *ngFor="let item of getChips()"
+          [selectable]="selectable"
+          [removable]="removable"
+          (removed)="remove(item)"
+        >
+          {{ item.label }}
+          <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+        </mat-chip>
+        <input
+          #input
+          [formControl]="inputFormControl"
+          [matAutocomplete]="auto"
+          [matChipInputFor]="chipList"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          (matChipInputTokenEnd)="add($event)"
+        />
+      </mat-chip-list>
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        (optionSelected)="selected($event)"
+      >
+        <mat-option *ngFor="let item of filteredItems" [value]="item.key">
+          {{ item.label }}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="formControl.invalid">{{ getErrorMessage() }}</mat-error>
+    </mat-form-field>
+  `,
+})
+export class OnkaReferenceComponent extends OnkaInputComponent
+  implements OnInit, AfterViewInit {
+  visible = true;
+  selectable = true;
+  removable = true;
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  inputFormControl = new FormControl();
+  filteredItems: OnkaOption[];
+
+  @ViewChild('input') input: ElementRef<HTMLInputElement>;
+  @ViewChild('auto') matAutocomplete: MatAutocomplete;
+
+  _reference: OnkaReference;
+
+  constructor(
+    public formControl: FormControl,
+    public pass: OnkaInputPass,
+    public onkaService: OnkaService,
+    private apiBusiness: ApiBusinessLogic
+  ) {
+    super(formControl, pass, onkaService);
+    this._reference = this.pass.column.reference;
+  }
+
+  ngOnInit(): void {
+    console.log('a', this.pass.data);
+  }
+
+  ngAfterViewInit() {
+    this.inputFormControl.valueChanges
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        tap(() => this.loadData())
+      )
+      .subscribe();
+    fromEvent(this.input.nativeElement, 'focus')
+      .pipe(tap(() => this.loadData()))
+      .subscribe();
+  }
+
+  getChips() {
+    return this.formControl.value;
+  }
+
+  loadData() {
+    var request = new ApiSearchRequest();
+    request.pagination.page = 1;
+    request.pagination.perPage = this._reference.pageSize;
+    request.sort.field = this._reference.sortField;
+    request.sort.order = (this._reference.sortDirection || 'asc').toUpperCase();
+    request.filter[this._reference.filterField] = this.inputFormControl.value;
+    return this.apiBusiness
+      .search(this.pass.column.reference.reference, request)
+      .subscribe((data) => {
+        this.filteredItems = data.value.map((x) => {
+          var option: OnkaOption = {
+            key: x.id,
+            label: x.name,
+          };
+          return option;
+        });
+      });
+  }
+
+  add(event: MatChipInputEvent): void {
+    console.log('val', this.formControl.value);
+  }
+
+  remove(item: OnkaOption): void {
+    const index = this.getChips().indexOf(item);
+
+    if (index >= 0) {
+      this.getChips().splice(index, 1);
+    }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.getChips().push({
+      key: event.option.value,
+      label: event.option.viewValue,
+    });
+    this.input.nativeElement.value = '';
+    this.inputFormControl.setValue(null);
+  }
+}
+
 export const allInputs = {
   OnkaFilterComponent,
   OnkaInputComponent,
@@ -278,4 +428,5 @@ export const allInputs = {
   OnkaSelectComponent,
   OnkaSlideToggleComponent,
   OnkaNumberComponent,
+  OnkaReferenceComponent,
 };

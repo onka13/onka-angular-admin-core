@@ -71,6 +71,7 @@ var sharedComponents: any[] = [
   allInputs.OnkaSelectComponent,
   allInputs.OnkaSlideToggleComponent,
   allInputs.OnkaTextareaComponent,
+  allInputs.OnkaReferenceComponent,
   allFields.OnkaDetailFieldComponent,
   allFields.OnkaGridFieldComponent,
   //...[Object.values(allInputs)],

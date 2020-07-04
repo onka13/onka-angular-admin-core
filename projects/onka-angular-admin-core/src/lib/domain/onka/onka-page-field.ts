@@ -1,5 +1,6 @@
 import { ValidatorFn } from '@angular/forms';
 import { Type } from '@angular/core';
+import { OnkaReference } from './onka-reference';
 
 /**
  * Field model
@@ -29,6 +30,11 @@ export class OnkaPageField {
    * filter name
    */
   filterName: string;
+
+  /**
+   * Reference
+   */
+  reference: OnkaReference;
 
   /**
    * Grid component

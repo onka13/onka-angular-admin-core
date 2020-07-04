@@ -43,6 +43,19 @@ export class ApiBusinessLogic {
   }
 
   /**
+   * Gets key-value list
+   * @param route route
+   * @param id id of item
+   */
+  gets(route, ids: []): Observable<ServiceResult<any>> {
+    return this.business.request<ServiceResult<any>>(
+      'POST',
+      `${route}/gets`,
+      ids
+    );
+  }
+
+  /**
    * Create new entity
    * @param route route
    * @param data entity data
@@ -88,5 +101,9 @@ export class ApiBusinessLogic {
       'DELETE',
       `${route}/delete/${id}`
     );
+  }
+
+  request(method, route, data): Observable<ServiceResult<any>> {
+    return this.business.request<ServiceResult<any>>(method, route, data);
   }
 }

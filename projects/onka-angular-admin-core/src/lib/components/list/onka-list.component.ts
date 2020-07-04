@@ -9,6 +9,7 @@ import {
   ComponentFactoryResolver,
   Injector,
   OnDestroy,
+  TemplateRef,
 } from '@angular/core';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -65,6 +66,8 @@ export class OnkaListComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   @Input() checkbox: boolean = false;
 
+  @Input() extraRowActions: (data: any) => any;
+
   /**
    * Left side content
    */
@@ -74,6 +77,11 @@ export class OnkaListComponent implements OnInit, AfterViewInit, OnDestroy {
    * Right side content
    */
   @ContentChild(OnkaSearchRightComponent) searchFieldsRight: ElementRef;
+
+/**
+   * 
+   */
+  @ContentChild("rowExtra", { read: TemplateRef }) rowExtra: TemplateRef<any>;
 
   /**
    * All column list to display
@@ -192,7 +200,7 @@ export class OnkaListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.refreshSubscription.unsubscribe();
+    this.refreshSubscription?.unsubscribe();
   }
 
   customSort(event) {
@@ -244,8 +252,8 @@ export class OnkaListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /**
    * Get grid components
-   * @param item 
-   * @param rowData 
+   * @param item
+   * @param rowData
    */
   getGridPortal(item: OnkaPageField, rowData) {
     var key =
@@ -345,9 +353,7 @@ export class OnkaListComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param id id
    */
   delete(id) {
-    this.uiManager.confirm({
-
-    }, (res) => {
+    this.uiManager.confirm({}, (res) => {
       if (!res) return;
       this.business.delete(this.pageConfig.route, id).subscribe(() => {
         this.loadData();
@@ -395,5 +401,13 @@ export class OnkaListComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   select_clicked(row) {
     this.onkaService.closeDialog(row);
+  }
+
+  /**
+   *
+   */
+  getExtraRowActions(row) {
+    if(!this.extraRowActions) return null;
+    return this.extraRowActions(row);
   }
 }

@@ -11,6 +11,8 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   OnDestroy,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -107,6 +109,26 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   _portals = {};
 
+  /**
+   * Emit on submit
+   */
+  @Output('onSubmit') onSubmitForm = new EventEmitter();
+
+  /**
+   * Emit on load
+   */
+  @Output('onLoad') onLoadForm = new EventEmitter();
+
+  /**
+   * load route
+   */
+  @Input() loadRoute;
+
+  /**
+   * submit route
+   */
+  @Input() submitRoute;
+
   constructor(
     private fb: FormBuilder,
     public onkaService: OnkaService,
@@ -136,7 +158,7 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.refreshSubscription.unsubscribe();
+    this.refreshSubscription?.unsubscribe();
   }
 
   /**
@@ -148,8 +170,11 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.status = 'loading';
+    var route = this.loadRoute
+      ? this.loadRoute
+      : this.pageConfig.route + this.id;
     this.business
-      .get(this.pageConfig.route, this.id)
+      .request('GET', route, null)
       .pipe(
         finalize(() => {
           this.status = 'done';
@@ -214,10 +239,17 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.form.valid || this.status == 'loading') {
       return;
     }
-    this.status = 'loading';
     const newData = { ...this.data, ...this.form.value };
-    this.business
-      .upsert(this.isEdit, this.pageConfig.route, newData)
+    if (this.onSubmitForm.observers.length > 0) {
+      this.onSubmitForm.emit(newData);
+      return;
+    }
+    this.status = 'loading';
+    var res = this.submitRoute
+      ? this.business.request('POST', this.submitRoute, null)
+      : this.business.upsert(this.isEdit, this.pageConfig.route, newData);
+
+    res
       .pipe(
         finalize(() => {
           this.status = 'done';
