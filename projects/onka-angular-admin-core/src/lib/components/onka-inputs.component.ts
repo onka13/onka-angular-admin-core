@@ -16,6 +16,7 @@ import { Observable, fromEvent } from 'rxjs';
 import {
   MatAutocomplete,
   MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
 } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { OnkaOption } from '../domain/onka/onka-types';
@@ -294,20 +295,15 @@ export class OnkaNumberComponent extends OnkaInputComponent {
 }
 
 /**
- * Onka ref component
+ * Onka multi reference component
  */
 @Component({
-  selector: 'onka-reference',
+  selector: 'onka-multi-reference',
   template: `
     <mat-form-field class="onka-input input-{{ pass.column.name }}">
       <mat-label>{{ getLabel() }}</mat-label>
       <mat-chip-list #chipList aria-label="selection">
-        <mat-chip
-          *ngFor="let item of getChips()"
-          [selectable]="selectable"
-          [removable]="removable"
-          (removed)="remove(item)"
-        >
+        <mat-chip *ngFor="let item of getChips()" [selectable]="selectable" [removable]="removable" (removed)="remove(item)">
           {{ item.label }}
           <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
         </mat-chip>
@@ -320,10 +316,7 @@ export class OnkaNumberComponent extends OnkaInputComponent {
           (matChipInputTokenEnd)="add($event)"
         />
       </mat-chip-list>
-      <mat-autocomplete
-        #auto="matAutocomplete"
-        (optionSelected)="selected($event)"
-      >
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
         <mat-option *ngFor="let item of filteredItems" [value]="item.key">
           {{ item.label }}
         </mat-option>
@@ -332,8 +325,7 @@ export class OnkaNumberComponent extends OnkaInputComponent {
     </mat-form-field>
   `,
 })
-export class OnkaReferenceComponent extends OnkaInputComponent
-  implements OnInit, AfterViewInit {
+export class OnkaMultiReferenceComponent extends OnkaInputComponent implements OnInit, AfterViewInit {
   visible = true;
   selectable = true;
   removable = true;
@@ -345,29 +337,27 @@ export class OnkaReferenceComponent extends OnkaInputComponent
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
   _reference: OnkaReference;
+  _loadData = true;
 
-  constructor(
-    public formControl: FormControl,
-    public pass: OnkaInputPass,
-    public onkaService: OnkaService,
-    private apiBusiness: ApiBusinessLogic
-  ) {
+  constructor(public formControl: FormControl, public pass: OnkaInputPass, public onkaService: OnkaService, private apiBusiness: ApiBusinessLogic) {
     super(formControl, pass, onkaService);
     this._reference = this.pass.column.reference;
   }
 
-  ngOnInit(): void {
-    console.log('a', this.pass.data);
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit() {
-    this.inputFormControl.valueChanges
+    fromEvent(this.input.nativeElement, 'keyup')
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        tap(() => this.loadData())
+        tap(() => {
+          this._loadData = true;
+          this.loadData();
+        }),
       )
       .subscribe();
+
     fromEvent(this.input.nativeElement, 'focus')
       .pipe(tap(() => this.loadData()))
       .subscribe();
@@ -378,44 +368,166 @@ export class OnkaReferenceComponent extends OnkaInputComponent
   }
 
   loadData() {
-    var request = new ApiSearchRequest();
-    request.pagination.page = 1;
-    request.pagination.perPage = this._reference.pageSize;
-    request.sort.field = this._reference.sortField;
-    request.sort.order = (this._reference.sortDirection || 'asc').toUpperCase();
-    request.filter[this._reference.filterField] = this.inputFormControl.value;
-    return this.apiBusiness
-      .search(this.pass.column.reference.reference, request)
-      .subscribe((data) => {
-        this.filteredItems = data.value.map((x) => {
+    console.log('loadData', this._loadData, this.inputFormControl.value);
+
+    if (!this._loadData) return;
+    this._loadData = false;
+    var _request = new ApiSearchRequest();
+    _request.pagination.page = 1;
+    _request.pagination.perPage = this._reference.pageSize;
+    _request.sort.field = this._reference.sortField;
+    _request.sort.order = (this._reference.sortDirection || 'asc').toUpperCase();
+    _request.filter[this._reference.filterField] = this.inputFormControl.value;
+    return this.apiBusiness.search(this.pass.column.reference.reference, _request).subscribe((data) => {
+      this.filteredItems = data.value
+        .filter((x) => {
+          return this.getChips().filter((y) => y.key == x.id).length == 0;
+        })
+        .map((x) => {
           var option: OnkaOption = {
             key: x.id,
             label: x.name,
           };
           return option;
         });
-      });
+    });
   }
 
   add(event: MatChipInputEvent): void {
-    console.log('val', this.formControl.value);
+    //console.log('val', this.formControl.value);
   }
 
   remove(item: OnkaOption): void {
     const index = this.getChips().indexOf(item);
-
     if (index >= 0) {
       this.getChips().splice(index, 1);
+      this._loadData = true;
     }
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
+    console.log('selected', event.option.value, event.option.viewValue, this.inputFormControl.value);
     this.getChips().push({
       key: event.option.value,
       label: event.option.viewValue,
     });
     this.input.nativeElement.value = '';
     this.inputFormControl.setValue(null);
+    this.input.nativeElement.blur();    
+    this._loadData = true;
+  }
+}
+
+/**
+ * Reference component
+ */
+@Component({
+  selector: 'onka-reference',
+  template: `
+    <mat-form-field class="onka-input input-{{ pass.column.name }}">
+      <mat-label>{{ getLabel() }}</mat-label>
+      <input #input matInput [formControl]="inputFormControl" [matAutocomplete]="auto"/>
+      <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="isClearable()" (click)="onClear($event)">
+        <mat-icon>close</mat-icon>
+      </button>
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+        <mat-option *ngFor="let item of filteredItems" [value]="item.key">
+          {{ item.label }}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="formControl.invalid">{{ getErrorMessage() }}</mat-error>
+    </mat-form-field>
+  `,
+})
+export class OnkaReferenceComponent extends OnkaInputComponent implements OnInit, AfterViewInit {
+  inputFormControl = new FormControl();
+  filteredItems: OnkaOption[];
+
+  @ViewChild('input') input: ElementRef<HTMLInputElement>;
+  @ViewChild('auto') matAutocomplete: MatAutocomplete;
+  @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
+
+  _reference: OnkaReference;
+
+  _selectedText = '';
+
+  constructor(public formControl: FormControl, public pass: OnkaInputPass, public onkaService: OnkaService, private apiBusiness: ApiBusinessLogic) {
+    super(formControl, pass, onkaService);
+    this._reference = this.pass.column.reference;
+  }
+
+  ngOnInit(): void {}
+
+  ngAfterViewInit() {
+    this.inputFormControl.valueChanges
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        tap(() => {
+          console.log('AAA valueChanges');
+          this.loadData();
+        }),
+      )
+      .subscribe();
+    fromEvent(this.input.nativeElement, 'focus')
+      .pipe(tap(() => this.loadData()))
+      .subscribe();
+    fromEvent(this.input.nativeElement, 'blur')
+      .pipe(tap(() => this.onBlur()))
+      .subscribe();
+  }
+
+  onBlur() {
+    // if (this.pass.column.isCreatable && !this.inputFormControl.value) {
+    //   this._selectedText = '';
+    //   return;
+    // }
+    if (this.inputFormControl.value != this._selectedText) {
+      this.inputFormControl.setValue(this._selectedText, {});
+    }
+  }
+
+  isClearable() {
+    return this.pass.column.isCreatable && this.inputFormControl.value;
+  }
+
+  onClear(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    this.formControl.setValue('');
+    this._selectedText = '';
+    this.inputFormControl.setValue(null, {}); // set null to load data next
+  }
+
+  loadData() {
+    if(this.inputFormControl.value != null && this.inputFormControl.value == this._selectedText) return;
+    if (this.input.nativeElement != document.activeElement) return;
+    var request = new ApiSearchRequest();
+    request.pagination.page = 1;
+    request.pagination.perPage = this._reference.pageSize;
+    request.sort.field = this._reference.sortField;
+    request.sort.order = (this._reference.sortDirection || 'asc').toUpperCase();
+    request.filter[this._reference.filterField] = this.inputFormControl.value;
+    return this.apiBusiness.search(this.pass.column.reference.reference, request).subscribe((data) => {
+      this.filteredItems = data.value
+        .filter((x) => {
+          return this.formControl.value != x.id;
+        })
+        .map((x) => {
+          var option: OnkaOption = {
+            key: x.id,
+            label: x.name,
+          };
+          return option;
+        });
+    });
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this._selectedText = event.option.viewValue;
+    this.formControl.setValue(event.option.value);
+    this.input.nativeElement.value = '';
+    this.inputFormControl.setValue(this._selectedText, { emitEvent: false });
   }
 }
 
@@ -428,5 +540,6 @@ export const allInputs = {
   OnkaSelectComponent,
   OnkaSlideToggleComponent,
   OnkaNumberComponent,
-  OnkaReferenceComponent,
+  OnkaMultiReferenceComponent,
+  OnkaReferenceComponent
 };

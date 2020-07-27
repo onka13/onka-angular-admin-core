@@ -172,7 +172,7 @@ export class OnkaUpsertComponent implements OnInit, AfterViewInit, OnDestroy {
     this.status = 'loading';
     var route = this.loadRoute
       ? this.loadRoute
-      : this.pageConfig.route + this.id;
+      : this.pageConfig.route + '/get/' + this.id;
     this.business
       .request('GET', route, null)
       .pipe(

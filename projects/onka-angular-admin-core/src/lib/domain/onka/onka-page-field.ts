@@ -97,6 +97,11 @@ export class OnkaPageField {
   validators: ValidatorFn[];
 
   /**
+   * Is Required
+   */
+  isRequired: boolean;
+
+  /**
    * Format in grid list
    */
   format: (row: any, value: any) => string;

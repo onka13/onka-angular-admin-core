@@ -56,7 +56,7 @@ export class UIManagerService {
       this.displayMessage(msg, 'info');
     }
     if (response.status == 400) {
-      if (response.code == 100) {
+      if (response.code == 100 || response.code == 101) {
         this.router.navigate(['/login']);
       }
       return;
